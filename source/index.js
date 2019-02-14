@@ -1,21 +1,20 @@
+//GJ-修改
 import * as helper from './helper'
-import React, { Component } from 'react'
+import React, { PropTypes, Component } from 'react'
 import {
     StyleSheet,
+    Dimensions,
     PanResponder,
     View,
-    Text,
-    Dimensions
+    Text
 } from 'react-native'
 import Line from './line'
 import Circle from './circle'
-import PropTypes from 'prop-types';
-
-const Width = Dimensions.get('window').width;
-const Height = Dimensions.get('window').height;
-const isVertical = Height > Width;
-const Top = isVertical ? (Height - Width)/2.0 * 1.25 : 10;
-const Radius = isVertical ? Width / 10 : Width / 25;
+const Width = Dimensions.get('window').width
+const Height = Dimensions.get('window').height
+const Top = (Height - Width)/2.0 * 1.5
+const marginEdge = 20;
+const Radius = (Width-2*marginEdge) / 10
 
 export default class GesturePassword extends Component {
     constructor(props) {
@@ -29,13 +28,14 @@ export default class GesturePassword extends Component {
         // getInitialState
         let circles = [];
         let Margin = Radius;
+
         for (let i=0; i < 9; i++) {
             let p = i % 3;
             let q = parseInt(i / 3);
             circles.push({
                 isActive: false,
-                x: p * (Radius * 2 + Margin) + Margin + Radius,
-                y: q * (Radius * 2 + Margin) + Margin + Radius
+                x: p * (Radius * 2 + Margin) + Margin + Radius+marginEdge,
+                y: q * (Radius * 2 + Margin) + Margin + Radius,
             });
         }
 
@@ -74,7 +74,9 @@ export default class GesturePassword extends Component {
         return (
             <View style={[styles.frame, this.props.style, {flex: 1}]}>
                 <View style={styles.message}>
-                    <Text style={[styles.msgText, this.props.textStyle, {color: color}]}>
+                    <Text style={[styles.msgText, this.props.textStyle, {color: color}]}
+                          allowFontScaling={false}
+                    >
                         {this.state.message || this.props.message}
                     </Text>
                 </View>
@@ -91,7 +93,7 @@ export default class GesturePassword extends Component {
 
     renderCircles() {
         let array = [], fill, color, inner, outer;
-        let { status, normalColor, wrongColor, rightColor, innerCircle, outerCircle } = this.props;
+        let { status, wrongColor, rightColor, innerCircle, outerCircle } = this.props;
 
         this.state.circles.forEach(function(c, i) {
             fill = c.isActive;
@@ -100,7 +102,10 @@ export default class GesturePassword extends Component {
             outer = !!outerCircle;
 
             array.push(
-                <Circle key={'c_' + i} fill={fill} normalColor={normalColor} color={color} x={c.x} y={c.y} r={Radius} inner={inner} outer={outer} />
+                <Circle key={'c_' + i} fill={fill}
+                        color={color}
+                        x={c.x} y={c.y}
+                        r={Radius-10} inner={inner} outer={outer} />
             )
         });
 
@@ -171,8 +176,8 @@ export default class GesturePassword extends Component {
     }
 
     onStart(e, g) {
-        let x = isVertical ? e.nativeEvent.pageX : e.nativeEvent.pageX - Width/3.4;
-        let y = isVertical ? e.nativeEvent.pageY - Top/1.25 : e.nativeEvent.pageY - 30;
+        let x = e.nativeEvent.pageX;
+        let y = e.nativeEvent.pageY - Top;
 
         let lastChar = this.getTouchChar({x, y});
         if ( lastChar ) {
@@ -198,8 +203,8 @@ export default class GesturePassword extends Component {
     }
 
     onMove(e, g) {
-        let x = isVertical ? e.nativeEvent.pageX : e.nativeEvent.pageX - Width/3.4;
-        let y = isVertical ? e.nativeEvent.pageY - Top/1.25 : e.nativeEvent.pageY - 30;
+        let x = e.nativeEvent.pageX;
+        let y = e.nativeEvent.pageY - Top;
 
         if ( this.isMoving ) {
             this.refs.line.setNativeProps({end: {x, y}});
@@ -272,7 +277,6 @@ export default class GesturePassword extends Component {
 
 GesturePassword.propTypes = {
     message: PropTypes.string,
-    normalColor: PropTypes.string,
     rightColor: PropTypes.string,
     wrongColor: PropTypes.string,
     status: PropTypes.oneOf(['right', 'wrong', 'normal']),
@@ -283,11 +287,10 @@ GesturePassword.propTypes = {
     allowCross: PropTypes.bool,
     innerCircle: PropTypes.bool,
     outerCircle: PropTypes.bool
-};
+}
 
 GesturePassword.defaultProps = {
     message: '',
-    normalColor: '#5FA8FC',
     rightColor: '#5FA8FC',
     wrongColor: '#D93609',
     status: 'normal',
@@ -295,7 +298,7 @@ GesturePassword.defaultProps = {
     allowCross: false,
     innerCircle: true,
     outerCircle: true
-};
+}
 
 const styles = StyleSheet.create({
     frame: {
@@ -303,15 +306,15 @@ const styles = StyleSheet.create({
     },
     board: {
         position: 'absolute',
-        left: isVertical ? 0 : Width/3.4,
-        top: isVertical ? Top/1.5 : 30,
+        left: 0,
+        top: Top,
         width: Width,
         height: Height
     },
     message: {
         position: 'absolute',
         left: 0,
-        top: 20,
+        top: Top / 2.2,
         width: Width,
         height: Top / 3,
         alignItems: 'center',
