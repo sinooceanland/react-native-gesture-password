@@ -1,17 +1,17 @@
-import React, { Component } from 'react'
+import React, { PropTypes, Component } from 'react'
 import { StyleSheet, View } from 'react-native'
-import PropTypes from 'prop-types';
+
 export default class Circle extends Component {
     constructor(props) {
         super(props);
     }
 
     render() {
-        let {color, normalColor, fill, x, y, r, inner, outer} = this.props;
+        let {color, fill, x, y, r, inner, outer} = this.props;
 
         return (
             <View style={[styles.outer,
-                        {left: x - r, top: y - r, width: 2 * r, height: 2 * r, borderRadius: r}, {borderColor: normalColor},
+                        {left: x - r, top: y - r, width: 2 * r, height: 2 * r, borderRadius: r},
                         fill && {borderColor: color},
                         !outer && {borderWidth: 0}]}>
 
